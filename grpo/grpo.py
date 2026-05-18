@@ -87,6 +87,24 @@ def build_agent_loop_yaml(args: argparse.Namespace, out_path: Path) -> None:
         yaml.safe_dump(cfg, f, sort_keys=False)
 
 
+def ensure_verl_installed(python_executable: str, env: dict[str, str]) -> None:
+    check_cmd = [
+        python_executable,
+        "-c",
+        "import verl.trainer.main_ppo, verl.trainer.ppo.ray_trainer",
+    ]
+    try:
+        subprocess.run(check_cmd, env=env, check=True, capture_output=True, text=True)
+    except (FileNotFoundError, subprocess.CalledProcessError) as e:
+        stderr = getattr(e, "stderr", "") or ""
+        raise RuntimeError(
+            "VERL is not importable from the selected Python environment. "
+            "Install VERL first, then rerun GRPO. For example: "
+            "`pip install -e /path/to/verl`."
+            + (f"\nImport error:\n{stderr.strip()}" if stderr.strip() else "")
+        ) from e
+
+
 def main() -> None:
     args = parse_args()
 
@@ -168,15 +186,20 @@ def main() -> None:
     print(" ".join(map(str, cmd)))
     print("")
 
-    env = os.environ.copy()
     project_root = Path(__file__).resolve().parents[1]
-    py_paths = [str(project_root / "vllm"), str(project_root)]
+    env = os.environ.copy()
+    py_paths = [str(project_root)]
+    vllm_root = project_root / "vllm"
+    if vllm_root.is_dir():
+        py_paths.insert(0, str(vllm_root))
     old_pp = env.get("PYTHONPATH", "")
     if old_pp:
         py_paths.append(old_pp)
     env["PYTHONPATH"] = ":".join(py_paths)
 
-    rc = subprocess.call(cmd, env=env, cwd=str(project_root / "verl"))
+    ensure_verl_installed(args.python, env)
+
+    rc = subprocess.call(cmd, env=env, cwd=str(project_root))
     if rc != 0:
         raise SystemExit(rc)
 

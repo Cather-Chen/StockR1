@@ -55,6 +55,28 @@ Reinforcement learning related code lives under `grpo/`:
 
 The RL stage is intended to continue from an SFT checkpoint.
 
+GRPO uses VERL as an external framework dependency. Install VERL in the same Python
+environment that you use to launch GRPO, for example:
+
+```bash
+git clone https://github.com/volcengine/verl.git
+cd verl
+pip install -e .
+```
+
+Before launching GRPO, verify that the selected Python can import VERL:
+
+```bash
+python -c "import verl.trainer.main_ppo; print('verl ok')"
+```
+
+Then launch from this repository root:
+
+```bash
+bash grpo/scripts/run_grpo.sh
+```
+
+
 ### 4. Evaluate
 
 - `evaluate.py`: main evaluation script for loading models, generating answers, running the judge model, and saving results
@@ -111,4 +133,6 @@ If you mainly want to run experiments, start with:
 ## Notes
 
 - The training stack depends on `wandb`, `accelerate`, `deepspeed`, and `verl`
+- VERL must be installed by the user as an external package; do not place a
+  copied VERL source tree under `public_repo/verl`
 - Scripts contain placeholder `WANDB_API_KEY` values and should be updated before running

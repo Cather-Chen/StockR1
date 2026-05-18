@@ -23,7 +23,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from old.reward_new import compute_score as compute_answer_score
+from grpo.answer_reward import compute_score as compute_answer_score
 from utils.forecast_utils import returns_to_ohlcv
 
 

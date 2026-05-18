@@ -7,16 +7,23 @@ into wandb logs (train-aux/*), without editing VERL source files.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Any
 
 import hydra
 import numpy as np
 import ray
+import verl
 
 import verl.trainer.ppo.ray_trainer as ray_trainer
 from verl.experimental.reward_loop import migrate_legacy_reward_impl
 from verl.trainer.main_ppo import TaskRunner, run_ppo
 from verl.utils.device import auto_set_device
+
+
+_THIS_DIR = Path(__file__).resolve().parent
+_VERL_CONFIG_DIR = Path(verl.__file__).resolve().parent / "trainer" / "config"
+_VERL_CONFIG_PATH = os.path.relpath(_VERL_CONFIG_DIR, _THIS_DIR)
 
 
 def _is_tracked_reward_key(key: str) -> bool:
@@ -105,7 +112,7 @@ class PatchedTaskRunner(TaskRunner):
         return super().run(config)
 
 
-@hydra.main(config_path="../verl/verl/trainer/config", config_name="ppo_trainer", version_base=None)
+@hydra.main(config_path=_VERL_CONFIG_PATH, config_name="ppo_trainer", version_base=None)
 def main(config):
     auto_set_device(config)
     config = migrate_legacy_reward_impl(config)
