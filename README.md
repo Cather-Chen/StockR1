@@ -133,6 +133,4 @@ If you mainly want to run experiments, start with:
 ## Notes
 
 - The training stack depends on `wandb`, `accelerate`, `deepspeed`, and `verl`
-- VERL must be installed by the user as an external package; do not place a
-  copied VERL source tree under `public_repo/verl`
 - Scripts contain placeholder `WANDB_API_KEY` values and should be updated before running
