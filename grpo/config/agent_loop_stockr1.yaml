@@ -1,0 +1,10 @@
+- name: stockr1_two_stage_agent
+  _target_: grpo.verl_stock_agent_loop.StockR1TwoStageAgentLoop
+  stage1_max_new_tokens: 2048
+  stage2_max_new_tokens: 1024
+  stop_string_stage1: "</forecast_hint>"
+  tool_name: ts_forecast
+  ts_encoder_checkpoint: null
+  hint_conditioner_checkpoint: null
+  hint_residual_scale: 0.05
+  out_days: 10
